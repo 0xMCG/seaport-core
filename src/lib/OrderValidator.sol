@@ -812,6 +812,9 @@ contract OrderValidator is Executor, ZoneInteraction {
         } else {
             orderStatus.numerator = orderStatus.numerator - lastMatchStatus.numerator;
         }
+    }
+
+    function _clearLastMatchStatus(bytes32 orderHash) internal {
         delete _lastMatchStatus[orderHash];
     }
 

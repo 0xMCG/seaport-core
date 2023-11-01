@@ -829,7 +829,6 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
         {
             // Retrieve the length of the executions array and place on stack.
             uint256 totalExecutions = executions.length;
-            console.log("Total execution is", totalExecutions);
 
             // Iterate over each execution.
             for (uint256 i = 0; i < totalExecutions;) {

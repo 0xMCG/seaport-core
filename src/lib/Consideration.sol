@@ -127,17 +127,18 @@ contract Consideration is ConsiderationInterface, OrderCombiner, Ownable {
     ) onlyMembers external payable override returns (Execution[] memory /* executions */ ) {
         bytes32[] memory existingOrderHahes = originalOrderHashes[requestId];
         (Execution[] memory executions, bool returnBack) = _matchAdvancedOrdersWithRandom(
-            _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()),
+            _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(CalldataStart.pptr()),
             _toFulfillmentsReturnType(_decodeFulfillments)(CalldataStart.pptr(Offset_matchOrders_fulfillments)),
             existingOrderHahes,
             orderProbility
         );
         // change this if need partial fulfillment
-        if(returnBack) {
-            uint256 totalLength = existingOrderHahes.length;
-            for(uint256 i = 0; i < totalLength; ++i) {
+        uint256 totalLength = existingOrderHahes.length;
+        for(uint256 i = 0; i < totalLength; ++i) {
+            if(returnBack) {
                 _restoreOriginalStatus(existingOrderHahes[i]);
             }
+            _clearLastMatchStatus(existingOrderHahes[i]);
         }
         delete originalOrderHashes[requestId];
         emit MatchSuccessOrNot(requestId, !returnBack);
@@ -157,11 +158,12 @@ contract Consideration is ConsiderationInterface, OrderCombiner, Ownable {
             Execution[] memory executions,
             bytes32[] memory orderHashes
         ) = prepareOrdersWithRandom(
-            _toAdvancedOrdersReturnType(_decodeOrdersAsAdvancedOrders)(CalldataStart.pptr()),
+            _toAdvancedOrdersReturnType(_decodeAdvancedOrders)(CalldataStart.pptr()),
             premiumOrdersIndex,
             recipients
         );
         uint256 requestId = IVRFInterface(_vrf_controller).requestRandomWords(numWords);
+        console.log("requestId is", requestId);
         // clear reetrancy guard
         _clearReentrancyGuard();
         originalOrderHashes[requestId] = orderHashes;
