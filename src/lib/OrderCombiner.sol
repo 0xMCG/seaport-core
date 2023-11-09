@@ -463,21 +463,9 @@ contract OrderCombiner is OrderFulfiller, FulfillmentApplier {
                     OfferItem memory offerItem = offer[j];
 
                     // Apply order fill fraction to offer item end amount.
-                    // 这个numerator 和 denominator还是要看懂
                     uint256 endAmount = _getFraction(numerator, denominator, offerItem.endAmount);
 
-                    // Reuse same fraction if start and end amounts are equal.
-                    if (offerItem.startAmount == offerItem.endAmount) {
-                        // Apply derived amount to both start and end amount.
-                        offerItem.startAmount = endAmount;
-                    } else {
-                        // Apply order fill fraction to offer item start amount.
-                        offerItem.startAmount = _getFraction(numerator, denominator, offerItem.startAmount);
-                    }
-
-                    // Update amounts in memory to match the current amount.
-                    // Note that the end amount is used to track spent amounts.
-                    offerItem.startAmount = offerItem.endAmount;
+                    offerItem.startAmount = endAmount;
                 }
                 console.log("Finish one order");
             }
